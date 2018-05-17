@@ -1,0 +1,69 @@
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Adding python 3.6 repository
+      apt_repository:
+        repo: ppa:deadsnakes/ppa
+        state: present
+
+    - name: Installing python 3.6
+      apt:
+        name: python3.6
+        update_cache: yes
+
+    - name: Installing python3-pip nginx python3.6-gdbm
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python3-pip
+        - nginx
+        - python3.6-gdbm
+
+    - name: Starting nginx on boot
+      service:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Lower priority of python3.5
+      alternatives:
+              link: /usr/bin/python3
+              name: python3
+              path: /usr/bin/python3.5
+              priority: 1
+
+    - name: Set python 3.6 as python3
+      alternatives:
+              link: /usr/bin/python3
+              name: python3
+              path: /usr/bin/python3.6
+              priority: 10
+    - name: Create Project directory
+      file:
+        path: /var/project
+        state: directory
+
+    - name: Clone the application repo
+      git:
+        repo: https://github.com/Thegaijin/RecipeAPI.git
+        dest: /var/project/RecipeAPI
+        version: api_defence
+
+    - name: Install the virtualenv
+      command: pip3 install virtualenv
+
+    - name: create the virtualenv
+      command: virtualenv /var/project/env -p python3.6 creates="/var/project/env"
+
+    - name: Install the project requirements
+      pip:
+        requirements: /var/project/RecipeAPI/requirements.txt
+        virtualenv: /var/project/env
+
+    # - name: Creating virtualenv and activating a virtualenv
+    #   shell: |
+    #           virtualenv -p python3 env
+    #           source env/bin/activate
+    #           # pip3 install -r /home/ubuntu/Project/RecipeAPI/requirements.txt

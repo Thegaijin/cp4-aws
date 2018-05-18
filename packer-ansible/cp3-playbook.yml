@@ -32,20 +32,6 @@
         enabled: yes
         state: started
 
-    # - name: Lower priority of python3.5
-    #   alternatives:
-    #           link: /usr/bin/python3
-    #           name: python3
-    #           path: /usr/bin/python3.5
-    #           priority: 1
-
-    # - name: Set python 3.6 as python3
-    #   alternatives:
-    #           link: /usr/bin/python3
-    #           name: python3
-    #           path: /usr/bin/python3.6
-    #           priority: 10
-
     - name: Create Project directory
       file:
         path: /var/project
@@ -70,13 +56,13 @@
 
     - name: create .env file
       shell:
-        chdir: /home/ubuntu/
-        creates: .env
+        chdir: /var/project/
+        creates: \.env
         cmd: |
-          sudo bash -c 'cat > .env <<EOF
-          SECRET_KEY='wqrtaeysurid6lr7'
-          FLASK_CONFIG=development
-          DATABASE_URL='postgresql://thegaijin:12345678@cp3-db-instance.cjfdylbgjjyu.us-west-2.rds.amazonaws.com:5432/recipe_db'
+          sudo bash -c 'cat > \.env <<EOF
+          export SECRET_KEY='wqrtaeysurid6lr7'
+          export FLASK_CONFIG=development
+          export DATABASE_URL='postgresql://thegaijin:12345678@cp3-db-instance.cjfdylbgjjyu.us-west-2.rds.amazonaws.com:5432/recipe_db'
           EOF'
 
     - name: Removing nginx default.conf
@@ -108,16 +94,16 @@
 
     - name: Create start script
       shell:
-        chdir: /var/project/
+        chdir: /var/project/RecipeAPI/
         creates: startenv.sh
         cmd: |
           cat > startenv.sh <<EOF
           #!/bin/bash
 
-          cd /home/ubuntu
-          ls
+          cd /var/project/
           source env/bin/activate
           source .env
+
           cd RecipeAPI
 
           gunicorn manage:app
@@ -135,7 +121,7 @@
 
           [Service]
           User=ubuntu
-          ExecStart=/bin/bash /var/project/startenv.sh
+          ExecStart=/bin/bash /var/project/RecipeAPI/startenv.sh
           Restart=always
 
           [Install]
@@ -149,9 +135,3 @@
         sudo systemctl daemon-reload
         sudo systemctl enable recipe.service
         sudo systemctl start recipe.service
-
-    # - name: Creating virtualenv and activating a virtualenv
-    #   shell: |
-    #           virtualenv -p python3 env
-    #           source env/bin/activate
-    #           # pip3 install -r /home/ubuntu/Project/RecipeAPI/requirements.txt

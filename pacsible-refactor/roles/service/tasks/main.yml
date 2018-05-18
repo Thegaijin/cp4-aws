@@ -1,0 +1,41 @@
+---
+- name: Create start script
+  shell:
+    chdir: /var/project/RecipeAPI/
+    creates: startenv.sh
+    cmd: |
+      cat > startenv.sh <<EOF
+      #!/bin/bash
+
+      cd /var/project/
+      source env/bin/activate
+      source .env
+
+      cd RecipeAPI
+
+      gunicorn manage:app
+      EOF
+
+- name: Create start service
+  shell:
+    chdir: /etc/systemd/system/
+    creates: recipe.service
+    cmd: |
+      cat > recipe.service <<EOF
+      [Unit]
+      Description=recipe startup service
+      After=network.target
+
+      [Service]
+      User=ubuntu
+      ExecStart=/bin/bash /var/project/RecipeAPI/startenv.sh
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+
+- name: Move files
+  shell: |
+    sudo chmod 744 /var/project/RecipeAPI/startenv.sh
+    sudo chmod 664 /etc/systemd/system/recipe.service

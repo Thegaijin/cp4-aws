@@ -1,19 +1,18 @@
 {
   "variables": {
     "access_key": "{{env `aws_access_key`}}",
-    "secret_key": "{{env `aws_secret_key`}}",
-    "ami_id": "ami-4e79ed36"
+    "secret_key": "{{env `aws_secret_key`}}"
   },
   "builders": [
     {
       "type": "amazon-ebs",
-      "region": "us-west-2",
+      "region": "us-east-2",
       "access_key": "{{user `access_key`}}",
       "secret_key": "{{user `secret_key`}}",
-      "source_ami": "{{user `ami_id`}}",
+      "source_ami": "ami-916f59f4",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "CP3-17-{{isotime | clean_ami_name}}",
+      "ami_name": "cp3-17-{{isotime | clean_ami_name}}",
       "ami_description": "CP3 ansible packer AMI with Ubuntu 16.04 instance",
       "tags": {
         "role": "python-api-17-12-17"
@@ -25,11 +24,7 @@
   ],
   "provisioners": [
     {
-      "type": "shell",
-      "script": "ansible.sh"
-    },
-    {
-      "type": "ansible-local",
+      "type": "ansible",
       "playbook_file": "./cp3-playbook.yml"
     }
   ]

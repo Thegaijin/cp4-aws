@@ -1,13 +1,13 @@
 ---
 - name: Create start script
   shell:
-    chdir: /var/project/RecipeAPI/
+    chdir: /var/www/project/RecipeAPI/
     creates: startenv.sh
     cmd: |
       cat > startenv.sh <<EOF
       #!/bin/bash
 
-      cd /var/project/
+      cd /var/www/project/
       source env/bin/activate
       source .env
 
@@ -28,7 +28,7 @@
 
       [Service]
       User=ubuntu
-      ExecStart=/bin/bash /var/project/RecipeAPI/startenv.sh
+      ExecStart=/bin/bash /var/www/project/RecipeAPI/startenv.sh
       Restart=always
 
       [Install]
@@ -37,5 +37,5 @@
 
 - name: Move files
   shell: |
-    sudo chmod 744 /var/project/RecipeAPI/startenv.sh
+    sudo chmod 744 /var/www/project/RecipeAPI/startenv.sh
     sudo chmod 664 /etc/systemd/system/recipe.service

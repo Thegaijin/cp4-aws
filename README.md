@@ -50,3 +50,21 @@ Continue to step 3 and 4. At step 5 select `choose an existing key-pair`. Skip s
 At step 12, run the script using
 
 `. cp4-setup.sh`
+
+## CREATING A CUSTOM IMAGE WITH PACKER AND ANSIBLE
+
+Change directory to the pacsible-refactor directory.
+
+`cd pacsible-refactor`
+
+Run the following commands
+
+`packer validate pacsible-playbook.json`
+
+The above command checks the integrity of the packer template file.
+
+`packer build pacsible-playbook.json`
+
+The above command runs the packer template to build the image.
+
+Once the image has been created head over to the AMIs, your the new image will be under `My AMIs`. Launch an instance from that image. Follow the instructions above under the `Instructions for CP3 deployment` section to create the instance.

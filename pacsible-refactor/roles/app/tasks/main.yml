@@ -1,28 +1,28 @@
 - name: Create Project directory
   file:
-    path: /var/project
+    path: /var/www/project
     state: directory
 
 - name: Clone the application repo
   git:
     repo: https://github.com/Thegaijin/RecipeAPI.git
-    dest: /var/project/RecipeAPI
+    dest: /var/www/project/RecipeAPI
     version: api_defence
 
 - name: Install the virtualenv
   command: pip3 install virtualenv
 
 - name: create the virtualenv
-  command: virtualenv /var/project/env -p python3.6 creates="/var/project/env"
+  command: virtualenv /var/www/project/env -p python3.6 creates="/var/www/project/env"
 
 - name: Install the project requirements
   pip:
-    requirements: /var/project/RecipeAPI/requirements.txt
-    virtualenv: /var/project/env
+    requirements: /var/www/project/RecipeAPI/requirements.txt
+    virtualenv: /var/www/project/env
 
 - name: create .env file
   shell:
-    chdir: /var/project/
+    chdir: /var/www/project/
     creates: \.env
     cmd: |
       sudo bash -c 'cat > \.env <<EOF

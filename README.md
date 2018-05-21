@@ -51,20 +51,32 @@ At step 12, run the script using
 
 `. cp4-setup.sh`
 
-## CREATING A CUSTOM IMAGE WITH PACKER AND ANSIBLE
+## CREATING A CUSTOM IMAGE WITH PACKER AND ANSIBLE ON AWS
+
+Assuming you have already gotten your AWS access key and secret key from AWS. Set them in your environment variables.
+
+#### Install Packer and Ansible.
+
+If you are using a Macbook and have homebrew to do so, run these commands to install otherwise look at the [packer](https://www.packer.io/docs/install/index.html) and [ansible](https://docs.ansible.com/ansible/2.4/intro_installation.html) documentation on how to install them.
+
+`brew install packer`
+
+`brew install ansible`
 
 Change directory to the pacsible-refactor directory.
 
 `cd pacsible-refactor`
 
-Run the following commands
+Open the pacsible-template.json file and change the region
+
+### Run the following commands
 
 `packer validate pacsible-playbook.json`
 
-The above command checks the integrity of the packer template file.
+The above command validates the syntax and configuration of the packer template file.
 
-`packer build pacsible-playbook.json`
+`packer build -var 'ami_id=<pre-existing-image-id>' -var 'region=<your-region-of-choice>' pacsible-template.json`
 
-The above command runs the packer template to build the image.
+The above command runs the packer template to build the image. You should replace the ami_id and region place holders with the ami_id and region of your choice.
 
-Once the image has been created head over to the AMIs, your the new image will be under `My AMIs`. Launch an instance from that image. Follow the instructions above under the `Instructions for CP3 deployment` section to create the instance.
+Once the image has been created head over to the AMIs, your the new image will be under `My AMIs`. Launch an instance from that image. Follow the instructions above under the [Instructions for CP3 deployment](https://github.com/Thegaijin/cp4-aws#instructions-for-cp3-deployment) section to create the instance.

@@ -1,0 +1,126 @@
+---
+- hosts: all
+  become: yes
+
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+  tasks:
+    # - name: Adding certbot
+    #   apt_repository:
+    #     repo: ppa:certbot/certbot
+    #     state: present
+
+    - name: Installing certbot
+      apt:
+        # name: certbot
+        update_cache: yes
+
+    - name: Add node
+      command: curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+
+    - name: Installing nodejs nginx python-certbot-nginx build-essential
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nodejs
+        - nginx
+        # - python-certbot-nginx
+        - build-essential
+
+    - name: Starting nginx on boot
+      service:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Create Project directory
+      file:
+        path: /var/project
+        state: directory
+
+    - name: Clone the application repo
+      git:
+        repo: https://github.com/Thegaijin/reacipe.git
+        dest: /var/project/reacipe
+        version: ch-tests-156145809
+
+    - name: Install project dependencies
+      shell:
+        chdir: /var/project/reacipe
+        cmd:
+          npm install
+
+    - name: Removing nginx default.conf
+      command: rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+    - name: Adding nginx configuration
+      shell:
+        chdir: /etc/nginx/sites-available/
+        creates: default
+        cmd: |
+          sudo bash -c 'cat > default <<EOF
+          server {
+              server_name thegaijin.xyz www.thegaijin.xyz;
+              location / {
+                  proxy_pass http://127.0.0.1:3000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade \$http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host \$host;
+                  proxy_cache_bypass \$http_upgrade;
+                  proxy_redirect off;
+              }
+          }
+          EOF'
+          ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+    # - name: Creating symbolic link
+    #   command: ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+    - name: Reload nginx
+      command: systemctl restart nginx
+
+    - name: Reload nginx
+      command: sudo certbot --nginx
+
+    - name: Create start script
+      shell:
+        chdir: /var/project/reacipe/
+        creates: startapp.sh
+        cmd: |
+          cat > startenv.sh <<EOF
+          #!/bin/bash
+
+          npm start
+          EOF
+          sudo chmod 744 /var/project/reacipe/startenv.sh
+
+    - name: Create start service
+      shell:
+        chdir: /etc/systemd/system/
+        creates: reacipe.service
+        cmd: |
+          cat > reacipe.service <<EOF
+          [Unit]
+          Description=reacipe startup service
+          After=network.target
+
+          [Service]
+          User=ubuntu
+          ExecStart=/bin/bash /var/project/reacipe/startenv.sh
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+          sudo chmod 664 /etc/systemd/system/reacipe.service
+
+
+    - name: Move files
+      shell: |
+        # sudo chmod 744 /var/project/reacipe/startenv.sh
+        # sudo chmod 664 /etc/systemd/system/reacipe.service
+        sudo systemctl daemon-reload
+        sudo systemctl enable reacipe.service
+        sudo systemctl start reacipe.service

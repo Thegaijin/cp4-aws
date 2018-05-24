@@ -1,0 +1,34 @@
+{
+  "variables": {
+    "access_key": "{{env `aws_access_key`}}",
+    "secret_key": "{{env `aws_secret_key`}}",
+    "ami_id": "ami-db710fa3",
+    "region": "us-east-2"
+  },
+  "builders": [
+    {
+      "name": "CP4 Image",
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "access_key": "{{user `access_key`}}",
+      "secret_key": "{{user `secret_key`}}",
+      "source_ami": "{{user `ami_id`}}",
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "cp4-24-{{isotime | clean_ami_name}}",
+      "ami_description": "CP4 ansible packer AMI with Ubuntu 16.04 instance",
+      "tags": {
+        "role": "react-24-05-18"
+      },
+      "run_tags": {
+        "role": "buildCP4System"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "./cp4-playbook.yml"
+    }
+  ]
+}

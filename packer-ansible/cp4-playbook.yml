@@ -1,22 +1,17 @@
 ---
 - hosts: all
   become: yes
+  become_user: root
 
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
   tasks:
-    # - name: Adding certbot
-    #   apt_repository:
-    #     repo: ppa:certbot/certbot
-    #     state: present
-
-    - name: Installing certbot
+    - name: Update packages (apt-get update)
       apt:
-        # name: certbot
         update_cache: yes
 
     - name: Add node
-      command: curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+      shell: curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 
     - name: Installing nodejs nginx python-certbot-nginx build-essential
       apt:
@@ -25,7 +20,6 @@
       with_items:
         - nodejs
         - nginx
-        # - python-certbot-nginx
         - build-essential
 
     - name: Starting nginx on boot
@@ -47,12 +41,18 @@
 
     - name: Install project dependencies
       shell:
-        chdir: /var/project/reacipe
+        chdir: /var/project/reacipe/
         cmd:
-          npm install
+          sudo npm install
+
+    - name: copy key into the user directory
+      copy:
+        src: /Users/svictor/DevOps/cp4-aws/packer-ansible/cp-us-east-2-key-pair.pem
+        dest: /home/ubuntu/cp-us-east-2-key-pair.pem
+        mode: 0400
 
     - name: Removing nginx default.conf
-      command: rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+      command: rm -f /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
     - name: Adding nginx configuration
       shell:
@@ -75,26 +75,20 @@
           EOF'
           ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
-    # - name: Creating symbolic link
-    #   command: ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-
-    - name: Reload nginx
+    - name: Restart nginx
       command: systemctl restart nginx
-
-    - name: Reload nginx
-      command: sudo certbot --nginx
 
     - name: Create start script
       shell:
         chdir: /var/project/reacipe/
-        creates: startapp.sh
+        creates: startenv.sh
         cmd: |
           cat > startenv.sh <<EOF
           #!/bin/bash
 
+          cd /var/project/reacipe/
           npm start
           EOF
-          sudo chmod 744 /var/project/reacipe/startenv.sh
 
     - name: Create start service
       shell:
@@ -114,13 +108,11 @@
           [Install]
           WantedBy=multi-user.target
           EOF
-          sudo chmod 664 /etc/systemd/system/reacipe.service
 
-
-    - name: Move files
+    - name: Change permissions and start service
       shell: |
-        # sudo chmod 744 /var/project/reacipe/startenv.sh
-        # sudo chmod 664 /etc/systemd/system/reacipe.service
+        sudo chmod 744 /var/project/reacipe/startenv.sh
+        sudo chmod 664 /etc/systemd/system/reacipe.service
         sudo systemctl daemon-reload
         sudo systemctl enable reacipe.service
         sudo systemctl start reacipe.service

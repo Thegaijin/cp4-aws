@@ -2,12 +2,12 @@
   "variables": {
     "access_key": "{{env `aws_access_key`}}",
     "secret_key": "{{env `aws_secret_key`}}",
-    "ami_id": "ami-db710fa3",
+    "ami_id": "ami-6a003c0f",
     "region": "us-east-2"
   },
   "builders": [
     {
-      "name": "CP4 Image",
+      "name": "CP4-01-06-VPC",
       "type": "amazon-ebs",
       "region": "{{user `region`}}",
       "access_key": "{{user `access_key`}}",
@@ -15,10 +15,10 @@
       "source_ami": "{{user `ami_id`}}",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "cp4-24-{{isotime | clean_ami_name}}",
+      "ami_name": "cp4-01-06-{{isotime | clean_ami_name}}",
       "ami_description": "CP4 ansible packer AMI with Ubuntu 16.04 instance",
       "tags": {
-        "role": "react-24-05-18"
+        "role": "react-01-06-18"
       },
       "run_tags": {
         "role": "buildCP4System"

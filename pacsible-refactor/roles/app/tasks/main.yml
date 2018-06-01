@@ -12,6 +12,9 @@
 - name: Install the virtualenv
   command: pip3 install virtualenv
 
+- name: Install flask on image
+  command: pip3 install flask
+
 - name: create the virtualenv
   command: virtualenv /var/www/project/env -p python3.6 creates="/var/www/project/env"
 
@@ -28,5 +31,5 @@
       sudo bash -c 'cat > \.env <<EOF
       export SECRET_KEY='wqrtaeysurid6lr7'
       export FLASK_CONFIG=development
-      export DATABASE_URL='postgresql://thegaijin:12345678@cp3-db-instance.cjfdylbgjjyu.us-west-2.rds.amazonaws.com:5432/recipe_db'
+      export DATABASE_URL='postgresql://thegaijin:12345678@cp-vpc-instance.cp2zja5xyfln.us-east-2.rds.amazonaws.com:5432/recipe_db'
       EOF'

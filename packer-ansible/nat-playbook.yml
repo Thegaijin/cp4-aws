@@ -1,0 +1,64 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  remote_user: ubuntu
+
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+  tasks:
+    - name: Install iptables-persistent
+      apt:
+        name: iptables-persistent
+        update-cache: yes
+
+    - name: Delete rules file
+      command: rm /etc/iptables/rules.v4
+
+    - name: set iptable rules
+      shell:
+        chdir: /etc/iptables
+        creates: rules.v4
+        cmd: |
+          sudo bash -c 'cat > rules.v4 <<EOF
+          *filter
+          :INPUT ACCEPT [0:0]
+          :FORWARD ACCEPT [0:0]
+          :OUTPUT ACCEPT [72:9808]
+          -A INPUT -i eth0 -j ACCEPT
+          -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+          -A INPUT -p icmp -j ACCEPT
+          -A INPUT -i lo -j ACCEPT
+          -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+          -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+          -A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+          -A INPUT -j REJECT --reject-with icmp-host-prohibited
+          -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+          -A FORWARD -p icmp -j ACCEPT
+          -A FORWARD -i lo -j ACCEPT
+          -A FORWARD -i eth0 -j ACCEPT
+          -A FORWARD -j REJECT --reject-with icmp-host-prohibited
+          COMMIT
+          *nat
+          :PREROUTING ACCEPT [0:0]
+          :INPUT ACCEPT [0:0]
+          :OUTPUT ACCEPT [0:0]
+          :POSTROUTING ACCEPT [0:0]
+          -A POSTROUTING -o eth0 -j MASQUERADE
+          COMMIT
+          EOF'
+
+    - name: Activate ip forwarding
+      command: echo 1 > /proc/sys/net/ipv4/ip_forward
+
+    # - name: Set ip forwarding on boot
+    #   shell:
+    #     chdir: /etc/
+    #     cmd:
+    #       sed -i e 's/#net.ipv4.ip-forward=1/net.ipv4.ip-forward = 1/g' /etc/sysctl.conf
+
+    - name: Set ip forwarding on boot
+      lineinfile:
+        path: /etc/sysctl.conf
+        regexp: '^#net.ipv4.ip-forward=1'
+        line: 'net.ipv4.ip-forward = 1'

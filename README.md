@@ -80,3 +80,11 @@ The above command validates the syntax and configuration of the packer template 
 The above command runs the packer template to build the image. You should replace the ami_id and region place holders with the ami_id and region of your choice.
 
 Once the image has been created head over to the AMIs, your the new image will be under `My AMIs`. Launch an instance from that image. Follow the instructions above under the [Instructions for CP3 deployment](https://github.com/Thegaijin/cp4-aws#instructions-for-cp3-deployment) section to create the instance.
+
+### Create NAT instance image
+
+Make sure you are in the `packer-ansible folder` then run the command below
+
+`packer build -var 'ami_id=<pre-existing-image-id>' -var 'region=<your-region-of-choice>' nat-template.json`
+
+The above command runs the packer template to build the image. You should replace the ami_id and region place holders with the ami_id and region of your choice.

@@ -1,0 +1,34 @@
+{
+  "variables": {
+    "access_key": "{{env `aws_access_key`}}",
+    "secret_key": "{{env `aws_secret_key`}}",
+    "ami_id": "{{env `ami_id`}}",
+    "region": "{{env `region`}}"
+  },
+  "builders": [
+    {
+      "name": "NAT-04-06-VPC",
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "access_key": "{{user `access_key`}}",
+      "secret_key": "{{user `secret_key`}}",
+      "source_ami": "{{user `ami_id`}}",
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "NAT-04-06-{{isotime | clean_ami_name}}",
+      "ami_description": "NAT ansible packer AMI with Ubuntu 16.04 instance",
+      "tags": {
+        "role": "CP-NAT-INSTANCE"
+      },
+      "run_tags": {
+        "role": "buildNATSystem"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "./nat-playbook.yml"
+    }
+  ]
+}

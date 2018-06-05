@@ -7,7 +7,7 @@
   },
   "builders": [
     {
-      "name": "CP3-01-06-VPC",
+      "name": "CP3-05-06-VPC",
       "type": "amazon-ebs",
       "region": "{{user `region`}}",
       "access_key": "{{user `access_key`}}",
@@ -15,10 +15,10 @@
       "source_ami": "{{user `ami_id`}}",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "cp3-01-06-{{isotime | clean_ami_name}}",
+      "ami_name": "cp_api_image-{{isotime | clean_ami_name}}",
       "ami_description": "CP3 ansible packer AMI with Ubuntu 16.04 instance",
       "tags": {
-        "role": "python-api-01-06"
+        "role": "python-api-05-06"
       },
       "run_tags": {
         "role": "buildSystem"

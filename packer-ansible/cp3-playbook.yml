@@ -62,7 +62,7 @@
           sudo bash -c 'cat > \.env <<EOF
           export SECRET_KEY='wqrtaeysurid6lr7'
           export FLASK_CONFIG=development
-          export DATABASE_URL='postgresql://thegaijin:12345678@cp3-db-instance.cjfdylbgjjyu.us-west-2.rds.amazonaws.com:5432/recipe_db'
+          export DATABASE_URL='postgresql://thegaijin:12345678@cp-vpc-db.cy8feder8nh3.us-west-1.rds.amazonaws.com:5432/recipe_db'
           EOF'
 
     - name: Removing nginx default.conf
@@ -135,3 +135,4 @@
         sudo systemctl daemon-reload
         sudo systemctl enable recipe.service
         sudo systemctl start recipe.service
+...

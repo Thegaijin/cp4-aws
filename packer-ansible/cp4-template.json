@@ -15,7 +15,7 @@
       "source_ami": "{{user `ami_id`}}",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "cp4-01-06-{{isotime | clean_ami_name}}",
+      "ami_name": "cp_frontend_image-{{isotime | clean_ami_name}}",
       "ami_description": "CP4 ansible packer AMI with Ubuntu 16.04 instance",
       "tags": {
         "role": "react-01-06-18"

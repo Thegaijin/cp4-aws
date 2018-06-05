@@ -33,3 +33,4 @@
       export FLASK_CONFIG=development
       export DATABASE_URL='postgresql://thegaijin:12345678@cp-vpc-instance.cp2zja5xyfln.us-east-2.rds.amazonaws.com:5432/recipe_db'
       EOF'
+...

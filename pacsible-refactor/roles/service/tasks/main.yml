@@ -39,3 +39,4 @@
   shell: |
     sudo chmod 744 /var/www/project/RecipeAPI/startenv.sh
     sudo chmod 664 /etc/systemd/system/recipe.service
+...

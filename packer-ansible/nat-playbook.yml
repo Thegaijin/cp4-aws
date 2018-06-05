@@ -49,13 +49,8 @@
           EOF'
 
     - name: Activate ip forwarding
-      command: echo 1 > /proc/sys/net/ipv4/ip_forward
-
-    # - name: Set ip forwarding on boot
-    #   shell:
-    #     chdir: /etc/
-    #     cmd:
-    #       sed -i e 's/#net.ipv4.ip-forward=1/net.ipv4.ip-forward = 1/g' /etc/sysctl.conf
+      become_user: root
+      shell: echo 1 > /proc/sys/net/ipv4/ip_forward
 
     - name: Set ip forwarding on boot
       lineinfile:

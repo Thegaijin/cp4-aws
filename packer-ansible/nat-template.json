@@ -15,7 +15,7 @@
       "source_ami": "{{user `ami_id`}}",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "NAT-04-06-{{isotime | clean_ami_name}}",
+      "ami_name": "cp_nat_image-{{isotime | clean_ami_name}}",
       "ami_description": "NAT ansible packer AMI with Ubuntu 16.04 instance",
       "tags": {
         "role": "CP-NAT-INSTANCE"

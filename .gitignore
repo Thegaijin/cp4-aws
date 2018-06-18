@@ -1,0 +1,7 @@
+# gcp key
+andela-learning-22734c57a9a3.json
+
+*.retry
+*.pem
+
+.DS_Store

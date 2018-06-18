@@ -1,0 +1,36 @@
+- name: Create Project directory
+  file:
+    path: /var/www/project
+    state: directory
+
+- name: Clone the application repo
+  git:
+    repo: https://github.com/Thegaijin/RecipeAPI.git
+    dest: /var/www/project/RecipeAPI
+    version: api_defence
+
+- name: Install the virtualenv
+  command: pip3 install virtualenv
+
+- name: Install flask on image
+  command: pip3 install flask
+
+- name: create the virtualenv
+  command: virtualenv /var/www/project/env -p python3.6 creates="/var/www/project/env"
+
+- name: Install the project requirements
+  pip:
+    requirements: /var/www/project/RecipeAPI/requirements.txt
+    virtualenv: /var/www/project/env
+
+- name: create .env file
+  shell:
+    chdir: /var/www/project/
+    creates: \.env
+    cmd: |
+      sudo bash -c 'cat > \.env <<EOF
+      export SECRET_KEY='wqrtaeysurid6lr7'
+      export FLASK_CONFIG=development
+      export DATABASE_URL='postgresql://thegaijin:12345678@cp-vpc-instance.cp2zja5xyfln.us-east-2.rds.amazonaws.com:5432/recipe_db'
+      EOF'
+...

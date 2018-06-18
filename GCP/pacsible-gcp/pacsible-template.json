@@ -1,0 +1,25 @@
+{
+  "variables": {
+    "service_account_json": "/Users/svictor/DevOps/gcp/"
+  },
+  "builders": [
+    {
+      "name": "CP3-18-06-VPC",
+      "type": "googlecompute",
+      "project_id": "andela-learning",
+      "machine_type": "n1-standard-1",
+      "region": "us-west1",
+      "zone": "us-west1-b",
+      "account_file": "andela-learning-22734c57a9a3.json",
+      "ssh_username": "ubuntu",
+      "image_name": "thegaijin-api",
+      "source_image_family": "ubuntu-1604-lts"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "./gcp-playbook.yml"
+    }
+  ]
+}

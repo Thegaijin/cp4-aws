@@ -50,7 +50,8 @@
 
     - name: Activate ip forwarding
       become_user: root
-      shell: echo 1 > /proc/sys/net/ipv4/ip_forward
+      shell:
+        bash -c 'echo 1 > /proc/sys/net/ipv4/ip_forward'
 
     - name: Set ip forwarding on boot
       lineinfile:
